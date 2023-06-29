@@ -9,10 +9,7 @@ pipeline {
         }
         stage('Terraform init') {
             steps {
-                //echo "${params.Terraform_Action}"
-                //withAWS(credentials: 'AWS_Creds', region: 'us-east-1') {
-                //sh 'terraform get -update' 
-                sh 'terraform init'//}
+                sh 'terraform init'
             }
         }
         stage('Terraform apply') {
