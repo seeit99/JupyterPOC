@@ -17,7 +17,7 @@ pipeline {
                 echo "Enter File Name ${params.File_Name}"
                 echo "Pipeline Name ${params.Pipeline}"
                 withAWS(credentials: 'AWS_Creds', region: 'us-east-1') {
-                sh 'terraform -chdir=/var/lib/jenkins/jobs/${Pipeline}/workspace//JupyterPOC/${File_Name}/ init --lock=false'
+                sh 'terraform -chdir=/var/lib/jenkins/jobs/${Pipeline}/workspace/Jupiter-pipeline/${File_Name}/ init --lock=false'
                 }
             }
         }
