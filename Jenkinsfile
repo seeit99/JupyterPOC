@@ -1,89 +1,22 @@
 pipeline {
     agent any
 
-    parameters {
-        string(name: 'environment', defaultValue: 'terraform', description: 'Workspace/environment file to use for deployment')
-        booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
-        booleanParam(name: 'destroy', defaultValue: false, description: 'Destroy Terraform build?')
-
-    }
-
-
-    environment {
-        AWS_ACCESS_KEY_ID     = credentials('AKIAYMLLO5TVVF6RGUJF')
-        AWS_SECRET_ACCESS_KEY = credentials('wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY')
-    }
-
     stages {
-        stage('checkout') {
+        stage('Checkout') {
             steps {
-                 script{
-                        dir("terraform")
-                        {
-                            git "https://github.com/seeit99/JupyterPOC.git"
-                        }
-                    }
-                }
-            }
-
-        stage('Plan') {
-            when {
-                not {
-                    equals expected: true, actual: params.destroy
-                }
-            }
-            
-            steps {
-                sh 'terraform init -input=false'
-                sh 'terraform workspace select ${environment} || terraform workspace new ${environment}'
-
-                sh "terraform plan -input=false -out tfplan "
-                sh 'terraform show -no-color tfplan > tfplan.txt'
+                git branch: 'main', credentialsId: '<CREDS>', url: 'https://github.com/sumeetninawe/tf-tuts'
             }
         }
-        stage('Approval') {
-           when {
-               not {
-                   equals expected: true, actual: params.autoApprove
-               }
-               not {
-                    equals expected: true, actual: params.destroy
-                }
-           }
-           
-                
-            
-
-           steps {
-               script {
-                    def plan = readFile 'tfplan.txt'
-                    input message: "Do you want to apply the plan?",
-                    parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
-               }
-           }
-       }
-
-        stage('Apply') {
-            when {
-                not {
-                    equals expected: true, actual: params.destroy
-                }
-            }
-            
+        stage('Terraform init') {
             steps {
-                sh "terraform apply -input=false tfplan"
+                sh 'terraform init'
+            }
+        }
+        stage('Terraform apply') {
+            steps {
+                sh 'terraform apply --auto-approve'
             }
         }
         
-        stage('Destroy') {
-            when {
-                equals expected: true, actual: params.destroy
-            }
-        
-        steps {
-           sh "terraform destroy --auto-approve"
-        }
     }
-
-  }
 }
