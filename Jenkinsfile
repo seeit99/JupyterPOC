@@ -9,10 +9,10 @@ pipeline {
     }
 
 
-     environment {
-       withAWS(credentials: 'AWS_Creds', region: 'us-east-1')
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('AKIAYMLLO5TVYL57YHRW')
+        AWS_SECRET_ACCESS_KEY = credentials('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')
     }
-
 
     stages {
         stage('checkout') {
